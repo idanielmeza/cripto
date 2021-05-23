@@ -8,7 +8,6 @@ const objBusqueda = {
     criptomoneda: ''
 }
 
-
 //Crear UN Promise
 const obtenerCripto = cripto => new Promise(resolve=>{
     resolve(cripto);
@@ -22,16 +21,23 @@ document.addEventListener('DOMContentLoaded',()=>{
     monedaSelect.addEventListener('change', leerValor);
 })
 
-function consultarCripto(){
+async function consultarCripto(){
     const url = `https://min-api.cryptocompare.com/data/top/mktcapfull?limit=20&tsym=USD`;
 
-    fetch(url)
-        .then(respuesta=> respuesta.json())
-        .then(resultado=> obtenerCripto(resultado.Data))
-        .then(cripto=> selectCripto(cripto));
+    // fetch(url)
+    //     .then(respuesta=> respuesta.json())
+    //     .then(resultado=> obtenerCripto(resultado.Data))
+    //     .then(cripto=> selectCripto(cripto));
+
+    const respuesta = await fetch(url);
+    const resultado = await respuesta.json();
+    selectCripto(resultado.Data);
+    
+    
 }
 
 function selectCripto(cripto){
+    console.log(cripto);
     cripto.forEach(moneda=>{
         const {FullName,Name} = moneda.CoinInfo;
 
@@ -79,17 +85,15 @@ function mostrarAlerta(mensaje){
     },2000)
 }
 
-function consultarAPI(){
+async function consultarAPI(){
     const {moneda,criptomoneda} = objBusqueda;
     const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
 
     mostrarSpinner();
 
-    fetch(url)
-        .then(respuesta => respuesta.json())
-        .then(resultado => {
-            mostrarHTML(resultado.DISPLAY[criptomoneda][moneda]);
-        })
+    const respuesta = await fetch(url);
+    const resultado = await respuesta.json();
+    mostrarHTML(resultado.DISPLAY[criptomoneda][moneda]);
 }
 
 function mostrarHTML(cotizacion) {
